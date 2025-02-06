@@ -1,0 +1,35 @@
+function  [CoGreen]=CoGreenFunc(par,temp_UETX_dis)
+%% Generate the coherent part, i.e., dyadic Green's function
+alpha=par.wavenumber*par.UETX.distance;
+ChanScal=par.wavenumber*exp(-1i*alpha)./(4*pi*alpha.^3); % N_r*N_s
+ 
+% The direction of each tra-rec pair
+temp_direc_x= -temp_UETX_dis.X./par.UETX.distance;
+temp_direc_y= -temp_UETX_dis.Y./par.UETX.distance;
+temp_direc_z= temp_UETX_dis.Z./par.UETX.distance;
+
+direc.XX=temp_direc_x.*temp_direc_x;
+direc.YY=temp_direc_y.*temp_direc_y;
+direc.ZZ=temp_direc_z.*temp_direc_z;
+direc.XY=temp_direc_x.*temp_direc_y;
+direc.XZ=temp_direc_x.*temp_direc_z;
+direc.YZ=temp_direc_y.*temp_direc_z;
+
+ChanPolarFactorFirst=alpha.^2-1-1i.*alpha;
+ChanPolarFactorSecond=3-alpha.^2+3*1i.*alpha;
+
+PolarFactorXX=ChanPolarFactorFirst+ChanPolarFactorSecond.*direc.XX;
+PolarFactorYY=ChanPolarFactorFirst+ChanPolarFactorSecond.*direc.YY;
+PolarFactorZZ=ChanPolarFactorFirst+ChanPolarFactorSecond.*direc.ZZ;
+PolarFactorXY= ChanPolarFactorSecond.*direc.XY;
+PolarFactorXZ= ChanPolarFactorSecond.*direc.XZ;
+PolarFactorYZ= ChanPolarFactorSecond.*direc.YZ;
+
+CoGreen.XX=ChanScal.*PolarFactorXX;
+CoGreen.YY=ChanScal.*PolarFactorYY;
+CoGreen.ZZ=ChanScal.*PolarFactorZZ;
+CoGreen.XY=ChanScal.*PolarFactorXY;
+CoGreen.XZ=ChanScal.*PolarFactorXZ;
+CoGreen.YZ=ChanScal.*PolarFactorYZ;
+
+end
